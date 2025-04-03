@@ -7,10 +7,14 @@
     <link rel="stylesheet" href="/output.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Set canvas container size to 40% of screen */
+            @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+        *{
+            font-family: 'Montserrat', serif;
+        }
+        
         #chartContainer {
-            width: 40vw;  /* 40% of viewport width */
-            height: 40vh; /* 40% of viewport height */
+            width: 40vw;  
+            height: 40vh; 
         }
         canvas {
             width: 100% !important;
@@ -19,19 +23,14 @@
     </style>
 </head>
 <body class="bg-[#faf5ef] p-5">
+    <h1 class="mt-6 text-4xl tracking-[5px] font-light text-[#5b3e2d] text-center mb-6">
+        SHAH BHOGILAL BHURALAL SONS
+    </h1>
 
-    <div class="fixed top-0 left-0 h-full w-[75px] bg-[#faf5ef] shadow-lg flex flex-col items-center justify-center">
-        <button onclick="location.href='/dashboard'" class="p-4">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-[#5b3e2d]">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-          </svg>
-        </button>
-      </div>
-
-    <div class="max-w-4xl mx-auto bg-white p-5 rounded-lg shadow-lg">
+    <div class="max-w-4xl mx-auto mt-6 bg-white p-5 rounded-lg shadow-lg">
         <h2 class="text-2xl font-bold text-gray-700 text-center">Sales Dashboard</h2>
 
-        <div id="chartContainer" class="mx-auto">
+        <div id="chartContainer" class="mx-auto ">
             <canvas id="salesChart"></canvas>
         </div>
 
@@ -50,7 +49,7 @@
     </div>
 
     <script>
-        var salesChart = null; // Define chart globally to allow destruction
+        var salesChart = null; 
     
         function formatDateToMonYY(dateStr) {
             let date = new Date(dateStr);
@@ -66,7 +65,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Sales Data:", data); // Debugging output
+                    console.log("Sales Data:", data);
     
                     var labels = data.map(entry => 
                         url === '/monthly/sale' ? formatDateToMonYY(entry[labelField]) : entry[labelField]);
@@ -74,7 +73,6 @@
     
                     var ctx = document.getElementById('salesChart').getContext('2d');
     
-                    // Destroy previous chart to prevent overlap
                     if (salesChart !== null) {
                         salesChart.destroy();
                     }
@@ -106,7 +104,7 @@
                         options: {
                             
                             responsive: true,
-                            maintainAspectRatio: false, // Allows custom sizing
+                            maintainAspectRatio: false, 
                             scales: isMonthly ? {
                                 y: {
                                     beginAtZero: true
@@ -132,7 +130,7 @@
             fetchAndRenderChart('/category/sale', 'category', 'total_sum', 'Category Sales');
         }
     
-        MonthlySales(); // Load monthly sales chart on page load
+        MonthlySales();
     </script>
     
 </body>

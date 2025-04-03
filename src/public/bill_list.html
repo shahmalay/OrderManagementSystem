@@ -21,15 +21,6 @@
   <link rel="stylesheet" href="/output.css">
 </head>
 <body class="bg-[#faf5ef] min-h-screen flex animate-fade-in">
-  <div class="fixed top-0 left-0 h-full w-[75px] bg-[#faf5ef] shadow-lg flex flex-col items-center justify-center">
-    <button onclick="location.href='/dashboard'" class="p-4">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-[#5b3e2d]">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-      </svg>
-    </button>
-  </div>
-
-  <!-- Main Content -->
   <div class="flex-1">
     <h1 class="text-4xl font-light text-[#5b3e2d] text-center mt-6 p-6">
       SHAH BHOGILAL BHURALAL SONS
@@ -59,7 +50,7 @@
             </tr>
           </thead>
           <tbody id="table-body" class="bg-white">
-            <!-- Dynamic rows will be inserted here -->
+            <!-- dynamic rows -->
           </tbody>
         </table>
       </div>
@@ -70,9 +61,8 @@
   
     const tableBody = document.getElementById('table-body');
     const searchBar = document.getElementById('search-bar');
-    let items = []; // Store fetched data globally
+    let items = []; 
 
-    // Fetch and render items
     fetch('/get/bill')
       .then(response => response.json())
       .then(data => {
@@ -81,7 +71,7 @@
       })
       .catch(error => console.error('Error fetching data:', error));
 
-    // Render table rows dynamically
+    // dynamic rows
     function renderTable(data) {
       const tableBody = document.getElementById('table-body');
       const isLargeScreen = window.innerWidth > 768;
@@ -121,23 +111,17 @@
       `).join('');
 
 
-      // Add event listeners for "More Details" buttons after rendering
       document.querySelectorAll(".moreDetails").forEach(button => {
         button.addEventListener("click", function () {
           const billId = this.getAttribute("data-bill-id");
-          // Get the detailsRow which is the next sibling of the current row
           const detailsRow = this.closest("tr").nextElementSibling;
           const svgElement = this.querySelector("svg");
-          // Get the container (tbody) where the bill items will be inserted
           const listContainer = detailsRow.querySelector(".item-list");
-          // Clear any existing content in the container
           listContainer.innerHTML = "";
 
-          // Fetch additional details for this bill
           fetch(`/bill_item/${billId}`)
             .then(response => response.json())
             .then(data => {
-              // Loop through the fetched data and create table rows
               for (let i = 0; i < data.length; i++) {
                 const tr = document.createElement('tr');
               
@@ -157,7 +141,6 @@
                 td4.innerHTML = data[i].total;
                 tr.appendChild(td4);
 
-                // Append the row to the container
                 listContainer.appendChild(tr);
               }
             })
@@ -165,7 +148,6 @@
 
             
 
-          // Toggle the display of the details row and update the SVG arrow
           if (detailsRow.style.display === "none" || detailsRow.style.display === "") {
             detailsRow.style.display = "table-row";
             svgElement.classlist.add("rotate-180");
@@ -178,7 +160,7 @@
     }
     
 
-    // Search bar event listener
+    // Searchbar
     searchBar.addEventListener('input', () => {
       const query = searchBar.value.toLowerCase();
       const filteredItems = items.filter(item =>
@@ -193,9 +175,7 @@
     fetch('/get/bill')
   .then(response => response.json())
   .then(data => {
-    renderTable(data); // Initial table rendering
-
-    // Listen for window resize and re-render table dynamically
+    renderTable(data); 
     window.addEventListener("resize", () => renderTable(data));
   })
   .catch(error => console.error('Error fetching data:', error));

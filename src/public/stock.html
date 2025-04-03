@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Management</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
     *{
         font-family: 'Montserrat', serif;
     }
@@ -15,28 +16,27 @@
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   }
+  @media (min-width: 768px) {
+    .md\:table-cell {
+      display: table-cell;
+    }
+  }
+
   </style>
   <link rel="stylesheet" href="/output.css">
   
 </head>
 <body class="bg-[#faf5ef] min-h-screen animate-fade-in">
-  
-  <div class="fixed top-0 left-0 h-full w-[75px] bg-[#faf5ef] shadow-lg flex flex-col items-center justify-center">
-    <button onclick="location.href='/dashboard'" class="p-4">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-[#5b3e2d]">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-      </svg>
-    </button>
-  </div>
-
-    <h1 class="sticky text-4xl font-light text-[#5b3e2d] text-center mt-6 p-6">
+    <h1 class="sticky text-4xl font-light text-[#5b3e2d] tracking-[5px] text-center mt-6 p-6">
         SHAH BHOGILAL BHURALAL SONS
-      </h1>
-      <div class="mt-6 flex items-center justify-center">
+    </h1>
+
+
+  <div class="flex items-center justify-center">
+
   <div class="p-6 w-full max-w-4xl glass flex flex-col items-center justify-center">
     <h1 class="text-2xl font-bold text-gray-800 mb-4">Stock Management</h1>
-
-    <div class=" w-full flex flex-col items-center justify-center">
+    <div class=" w-full m-6 flex flex-col items-center justify-center">
       <div class="mb-4 w-full max-w-4xl">
         <input
           type="text"
@@ -50,13 +50,13 @@
   
     <table class="table-auto w-full rounded-lg text-center">
       <thead>
-        <tr class="text-[#5b3e2d] ">
+        <tr class="text-[#5b3e2d]">
           <th class="px-4 py-2 text-left">Item Name</th>
-          <th class="px-4 py-2 ">weight (KG)</th>
-          <th class="px-4 py-2">Tax</th>
-          <th class="px-4 py-2">Stock</th>
-          <th class="px-4 py-2 ">booked</th>
-          <th class="px-4 py-2 text-left">New Purchase</th>
+          <th class="px-4 py-2 hidden md:table-cell">Weight (KG)</th>
+      <th class="px-4 py-2 hidden md:table-cell">Tax</th>
+          <th class="px-2 py-1">Stock</th>
+          <th class="px-2 py-1 ">booked</th>
+          <th class="px-4 py-2 text-left">Purchase</th>
         </tr>
       </thead>
       <tbody id="table-body" class="bg-white">
@@ -66,44 +66,54 @@
     <button 
         class="mt-4 bg-teal-600 text-white px-6 py-2 rounded-lg text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-teal-700"
 
-      ><a onclick="location.href='/sbbs/newitem'">Add Item</a></button>
+      ><a href="/sbbs/newitem">Add Item</a></button>
   </div>
 </div>
 <script>
-    fetch('/get/item')
-      .then(response => response.json())
-      .then(data => {
-        const tableBody = document.getElementById('table-body');
-        tableBody.innerHTML = data.map(
-          (item, index) => `
-            <tr class="border-b bg-[#faf5ef]">
-              <td class="px-4 py-2 text-left">${item.item}</td>
-              <td class="px-4 py-2 text-center">${item.weight}</td>
-              <td class="px-4 py-2">${parseFloat(item.cgst) + parseFloat(item.sgst)}%</td>
-              <td class="px-4 py-2 text-center">${item.stock}</td>
-              <td class="px-4 py-2   text-center">${item.booked}</td>
-              <td class="px-4 py-2 flex items-end gap-2">
-                <form action="/add/purchase/${item.item_id}" method="POST">
-                  <input 
-                    type="number" 
-                    id="quantity" 
-                    name="quantity"
-                    class="w-16 border rounded-lg px-2 py-1 focus:outline-none" 
-                    min="1"
-                  />
-                  <button class="bg-teal-600 text-white px-4 py-1 rounded-lg transition-all duration-300 ease-in-out hover:bg-teal-700" type="submit">
-                    Purchase
-                  </button>
-                </form>
-              </td>
-               <td class="px-4 py-2 flex items-center gap-2">
-          </td>
-            </tr>
-          `
-        )
-        .join("");
-    })
-      .catch(error => console.error('Error fetching data:', error));
+
+fetch('/get/item')
+  .then(response => response.json())
+  .then(data => {
+    function renderTable(data) {
+  const tableBody = document.getElementById('table-body');
+  const isLargeScreen = window.innerWidth > 768;
+
+  tableBody.innerHTML = data.map((item) => `
+      <tr class="border-b bg-[#faf5ef]">
+        <td class="px-4 py-2 text-left">${item.item}</td>
+        ${isLargeScreen ? `<td class="px-4 py-2 text-center wgt">${item.weight}</td>` : ""}
+        ${isLargeScreen ? `<td class="px-4 py-2 text-center tax">${parseFloat(item.cgst) + parseFloat(item.sgst)}%</td>` : ""}
+        <td class="px-2 py-1 text-center">${item.stock}</td>
+        <td class="px-2 py-1 text-center">${item.booked}</td>
+        <td class="px-4 py-2 flex items-end gap-2">
+          <form action="/add/purchase/${item.item_id}" method="POST" class="flex items-center gap-2">
+            <input 
+              type="number" 
+              name="quantity" 
+              class="w-16 border rounded-lg px-2 py-1 focus:outline-none" 
+              min="1"
+            />
+            <button class="bg-teal-600 text-white px-4 py-1 rounded-lg transition-all duration-300 ease-in-out hover:bg-teal-700" type="submit">
+              +
+            </button>
+          </form>
+        </td>
+      </tr>
+    `).join("");
+}
+
+// Fetch items and render table
+fetch('/get/item')
+  .then(response => response.json())
+  .then(data => {
+    renderTable(data); // Initial table rendering
+
+    // Listen for window resize and re-render table dynamically
+    window.addEventListener("resize", () => renderTable(data));
+  })
+  .catch(error => console.error('Error fetching data:', error));
+})
+
 </script>
 <div id="toTop" class="group opacity-0 translate-x-[50px] bg-white rounded-full p-3 shadow-lg fixed bottom-5 right-5 transition-all duration-300 ease-in-out hover:bg-[#5b3e2d]" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#5b3e2d" class="peer size-6 stroke-[#5b3e2d] group-hover:stroke-white transition-all duration-300 ease-in-out">
@@ -143,32 +153,33 @@
 
   // Function to render the table
   function renderTable(data) {
-    tableBody.innerHTML = data.map(
-        (item) => `
-          <tr class="border-b bg-[#faf5ef]">
-            <td class="px-4 py-2 text-left">${item.item}</td>
-              <td class="px-4 py-2 text-center">${item.weight}</td>
-              <td class="px-4 py-2">${parseFloat(item.cgst) + parseFloat(item.sgst)}%</td>
-              <td class="px-4 py-2 text-center">${item.stock}</td>
-              <td class="px-4 py-2   text-center">${item.booked}</td>
-               <td class="px-4 py-2 flex items-end gap-2">
-              <form action="/add/purchase/${item.item_id}" method="POST">
-                <input 
-                  type="number" 
-                  name="quantity" 
-                  class="w-16 border rounded-lg px-2 py-1 focus:outline-none" 
-                  min="1"
-                />
-                <button class="bg-teal-600 text-white px-4 py-1 rounded-lg transition-all duration-300 ease-in-out hover:bg-teal-700" type="submit">
-                  Purchase
-                </button>
-              </form>
-            </td>
-          </tr>
-        `
-      )
-      .join('');
-  }
+  const tableBody = document.getElementById('table-body');
+  const isLargeScreen = window.innerWidth > 768;
+
+  tableBody.innerHTML = data.map((item) => `
+      <tr class="border-b bg-[#faf5ef]">
+        <td class="px-4 py-2 text-left">${item.item}</td>
+        ${isLargeScreen ? `<td class="px-4 py-2 text-center wgt">${item.weight}</td>` : ""}
+        ${isLargeScreen ? `<td class="px-4 py-2 text-center tax">${parseFloat(item.cgst) + parseFloat(item.sgst)}%</td>` : ""}
+        <td class="px-2 py-1 text-center">${item.stock}</td>
+        <td class="px-2 py-1 text-center">${item.booked}</td>
+        <td class="px-4 py-2 flex items-end gap-2">
+          <form action="/add/purchase/${item.item_id}" method="POST" class="flex items-center gap-2">
+            <input 
+              type="number" 
+              name="quantity" 
+              class="w-16 border rounded-lg px-2 py-1 focus:outline-none" 
+              min="1"
+            />
+            <button class="bg-teal-600 text-white px-4 py-1 rounded-lg transition-all duration-300 ease-in-out hover:bg-teal-700" type="submit">
+              +
+            </button>
+          </form>
+        </td>
+      </tr>
+    `).join("");
+}
+
 
   // Event listener for the search bar
   searchBar.addEventListener('input', () => {
@@ -181,7 +192,5 @@
     renderTable(filteredItems); // Re-render the table with filtered data
   });
 </script>
-
-
 </body>
 </html>
