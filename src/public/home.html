@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/output.css">
+  <title>Salesman Page</title>
+  <style>
+    *{
+       font-family: 'Montserrat', serif;
+    }
+  .glass {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-container {
+  width: 100%;
+  height: 200px;
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.card {
+  width: 100%;
+  height: 200px;
+  border-radius: inherit;
+}
+
+.card .front-content {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1)
+}
+
+.card .front-content p {
+  font-size: 60px;
+  font-weight: 700;
+  opacity: 1;
+  background: #5b3e2d;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1)
+}
+
+.card .content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  background: #5b3e2d;
+  color: #faf5ef;
+  padding: 20px;
+  line-height: 1.5;
+  border-radius: 5px;
+  pointer-events: auto;
+  transform: translateY(96%);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.card .content .heading {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.card:hover .content {
+  transform: translateY(0);
+  background: #faf5ef;
+  color: #5b3e2d;
+}
+
+.card:hover .front-content {
+  transform: translateY(-30%);
+}
+
+.card:hover .front-content p {
+  opacity: 0;
+}
+
+.card:hover .front-content h3 {
+  letter-spacing: 0;
+}
+
+  </style>
+
+</head>
+<body class="bg-[#faf5ef]">
+  <!-- Container -->
+  <div class="container mx-auto px-6 py-12 relative">
+    <div class="flex justify-between items-center mb-12">
+      <h1 class="text-4xl font-light text-[#5b3e2d] tracking-[5px]">
+        SHAH BHOGILAL BHURALAL SONS
+      </h1>
+      <!-- Profile Box -->
+      <div id="profileBox" class="bg-white/40 rounded-lg p-4 shadow-md text-center w-60 border border-[#5b3e2d]">
+        <h3 id="username" class="text-lg font-semibold text-gray-800"></h3>
+      </div>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      
+      <!-- Left Rectangle Card -->
+      <div class="glass md:col-span-1 bg-white/40 backdrop-blur-md shadow-lg rounded-lg p-6 flex flex-col justify-center items-center border border-white/30">
+        <div class="w-full justify-center items-center flex flex-col gap-4">
+            <a href="/sbbs/order" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
+                Create Order
+              </a>
+          <a href="/sbbs/salesmanStock" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
+            Stock
+          </a>
+          <a href="/sbbs/salesmanCustomer" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
+            Customer
+          </a>
+          <a href="/sbbs/updateProfile" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
+            Update Profile
+          </a>
+          <button onclick="Logout()" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300">
+            Logout
+          </button>
+        </div>
+      </div>
+      
+
+      <!-- Right Grid Cards -->
+      <div id="orderData" class="sm:col-span-1 md:col-span-2 lg:col-span-3 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+      </div>
+    </div>
+  </div>
+<script>
+  function Logout() {
+    fetch('/logout', { method: 'GET' })
+        .then(response => {
+            if (response.ok) {
+                sessionStorage.clear();
+                localStorage.clear();
+                window.location.href = '/';
+            } else {
+                alert('Logout failed');
+            }
+        })
+        .catch(error => console.error('Error logging out:', error));
+}
+
+fetch('/get/order')
+      .then(response => response.json())
+      .then(data => {
+        const List = document.getElementById('orderData');
+        data.forEach(order => {
+          const div = document.createElement('div');
+          div.classList = 'card-container';
+          div.innerHTML = `
+            <div class='card'>
+              <div class='front-content'>
+                <h3 class="font-medium uppercase tracking-[4px] transition-all duration-200 ease-in-out">${order.customer}</h3>
+              </div>
+              <div class='content'>
+                <p>NOTE : ${order.note} <br> DATE : ${order.date} <br> BY : ${order.username}</p>
+                <a href='/update/order/${order.order_id}' class="px-4 py-2 bg-[#faf5ef] text-gray-800 rounded-lg border border-[#5b3e2d]-500 shadow-sm hover:bg-teal-600 hover:text-[#faf5ef] transition duration-300 text-center">EDIT</a>
+              </div>
+            </div>
+          `;
+          List.appendChild(div);
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+      fetch(`/get/profile`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('username').textContent = data.username;
+        document.getElementById('userType').textContent = data.user_type;
+      })
+      .catch(error => console.error('Error fetching profile:', error));
+
+    </script>
+    
+</body>
+</html>

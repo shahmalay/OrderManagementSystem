@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form</title>
+   <link rel="stylesheet" href="/output.css">
+    <style>
+        .suggestions {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 200px; /* Adjust as needed */
+    overflow-y: auto;
+    width: 100%; /* Ensures it matches the width of the input field */
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a modern look */
+    border-radius: 0.375rem; /* Rounded corners */
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 0.875rem; /* Slightly smaller font */
+}
+
+.suggestion-item:hover {
+    background-color: #f3f4f6; /* Light gray hover effect */
+}
+
+/* Ensure the suggestion box does not overflow outside the parent container */
+.suggestions {
+    overflow: hidden;
+    clip-path: inset(0 0 -10px 0); /* Prevent content from visually spilling out */
+}
+
+/* Optional: Add a scroll bar if content overflows */
+.suggestions::-webkit-scrollbar {
+    width: 8px; /* Narrow scrollbar */
+}
+
+.suggestions::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0; /* Gray scrollbar thumb */
+    border-radius: 4px;
+}
+
+.suggestions::-webkit-scrollbar-thumb:hover {
+    background-color: #a0aec0; /* Darker gray on hover */
+}
+
+.glass {
+    backdrop-filter: blur(50px);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+    </style>
+</head>
+<body class="bg-[#faf5ef] min-h-screen flex items-center justify-center">
+    
+    <div class="glass w-3/4 m-auto p-6">
+        <h2 class="text-2xl font-semibold text-center text-gray-700 mb-6">Order Form</h2>
+
+        <form autocomplete="off" id="orderForm" action="/submit/order" method="post" class="space-y-6">
+            <div class="space-y-2">
+                <label for="orderDate" class="block text-gray-600 font-medium">Order Date</label>
+                <input type="date" id="orderDate" name="orderDate" required readonly
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-indigo-200">
+            </div>
+
+            <div class="space-y-2 relative">
+                <label for="customerName" class="block text-gray-600 font-medium">Customer Name</label>
+                <input type="text" id="customerName" name="customerName" required
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-indigo-200">
+                <div id="customerSuggestions" class="suggestions hidden absolute bg-white border border-gray-300 w-full max-h-40 overflow-y-auto z-10"></div>
+            </div>
+
+            <table id="orderTable" class="w-full text-center">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2">Item Name</th>
+                        <th class="px-4 py-2">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="px-4 py-2">
+                            <div class="relative">
+                                <input type="text" id="itemName" name="itemName" class="item-name w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-indigo-200" placeholder="Enter item name" required>
+                                <div id="itemSuggestions" class="suggestions hidden absolute bg-white border border-gray-300 w-full max-h-40 overflow-y-auto z-10"></div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-2">
+                            <input type="number" name="quantity" class="quantity w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-indigo-200" min="1" placeholder="Enter quantity" required>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button type="button" class="add-row-btn bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+                    onclick="addRow()">Add Another Item</button>
+
+            <div class="space-y-2">
+                <label for="note" class="block text-gray-600 font-medium">Note</label>
+                <textarea id="note" name="note" rows="3"
+                          class="w-full border border-gray-300rounded-lg px-3 py-2 focus:ring focus:ring-indigo-200"></textarea>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <button type="submit"
+                        class="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition font-medium">Submit Order</button>
+            </div>
+        </form>
+    </div>
+    <div id="toTop" class="group opacity-0 translate-x-[50px] bg-white rounded-full p-3 shadow-lg fixed bottom-5 right-5 transition-all duration-300 ease-in-out hover:bg-[#5b3e2d]" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#5b3e2d" class="peer size-6 stroke-[#5b3e2d] group-hover:stroke-white transition-all duration-300 ease-in-out">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+        </svg>  
+      </div>
+      <script>
+        const toTop = document.getElementById('toTop');
+        window.addEventListener('scroll', () => {
+          const scrollY = window.scrollY;
+          if (scrollY > 10) {
+            toTop.classList.add('opacity-100');
+            toTop.classList.add('translate-x-[0]');
+            toTop.classList.remove('opacity-0');
+            toTop.classList.remove('translate-x-[50px]');
+          } else {
+            toTop.classList.add('opacity-0');
+            toTop.classList.remove('opacity-100');
+            toTop.classList.add('translate-x-[50px]');
+            toTop.classList.remove('translate-x-[0]');
+          }
+        });
+      </script>
+    <script>
+        const currentDate = new Date().toISOString().split('T')[0];
+        document.getElementById("orderDate").value = currentDate;
+        document.getElementById("orderDate").ReadOnly = true;
+        
+        function addRow() {
+    const table = document.getElementById("orderTable").getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+
+    const cell1 = newRow.insertCell(0);
+    cell1.classList.add("px-4", "py-2");
+
+    const cell2 = newRow.insertCell(1);
+    cell2.classList.add("px-4", "py-2");
+
+    const cell3 = newRow.insertCell(2); // Cell for the remove icon
+    cell3.classList.add("text-center");
+
+    const rel = document.createElement("div");
+    rel.classList.add("relative", "w-full");
+
+    const itemNameInput = document.createElement("input");
+    itemNameInput.type = "text";
+    itemNameInput.name = "itemName";
+    itemNameInput.classList.add("item-name", "w-full", "border", "border-gray-300", "rounded-lg", "px-3", "py-2", "focus:ring", "focus:ring-indigo-200");
+    itemNameInput.placeholder = "Enter item name";
+    itemNameInput.required = true;
+
+    const suggestionsBox = document.createElement("div");
+    suggestionsBox.classList.add("suggestions", "hidden", "absolute", "bg-white", "border", "border-gray-300", "w-full", "max-h-40", "overflow-y-auto", "z-10");
+
+    const qtyInput = document.createElement("input");
+    qtyInput.type = "number";
+    qtyInput.name = "quantity";
+    qtyInput.classList.add("quantity", "w-full", "border", "border-gray-300", "rounded-lg", "px-3", "py-2", "focus:ring", "focus:ring-indigo-200");
+    qtyInput.min = "1";
+    qtyInput.placeholder = "Enter quantity";
+    qtyInput.required = true;
+
+    const removeIcon = document.createElement("span");
+    removeIcon.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer transition duration-300 ease-in-out">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>`;
+    removeIcon.onclick = function () {
+        newRow.remove(); // Remove this row when clicked
+    };
+
+    cell1.appendChild(rel);
+    rel.appendChild(itemNameInput);
+    rel.appendChild(suggestionsBox);
+    cell2.appendChild(qtyInput);
+    cell3.appendChild(removeIcon); // Add remove icon to row
+
+    // Attach event listener for the new item name input
+    itemNameInput.addEventListener('input', function () {
+        const name_input = itemNameInput.value;
+        const table = 'item';
+        if (name_input.length >= 1) {
+            fetchSuggestions(table, name_input, suggestionsBox, itemNameInput);
+        } else {
+            suggestionsBox.style.display = 'none';
+        }
+    });
+}
+
+        const customerNameInput = document.getElementById('customerName');
+        const customerSuggestionsBox = document.getElementById('customerSuggestions');
+        const itemNameInput = document.getElementById('itemName');
+        const itemSuggestionsBox = document.getElementById('itemSuggestions');
+    
+        customerNameInput.addEventListener('input', function() {
+            const name_input = customerNameInput.value;
+            const table = 'customer';
+            if (name_input.length >= 1) {
+                fetchSuggestions(table, name_input, customerSuggestionsBox, customerNameInput);
+            } else {
+                customerSuggestionsBox.style.display = 'none';
+            }
+        });
+    
+        itemNameInput.addEventListener('input', function() {
+            const name_input = itemNameInput.value;
+            const table = 'item';
+            if (name_input.length >= 1) {
+                fetchSuggestions(table, name_input, itemSuggestionsBox, itemNameInput);
+            } else {
+                itemSuggestionsBox.style.display = 'none';
+            }
+        });
+    
+        // fetching suggestions from database
+        function fetchSuggestions(table, name_input, suggestionsBox, inputField) {
+            fetch(`/suggest/${table}/${name_input}`)
+                .then(response => response.json())
+                .then(data => {
+                    // If we get names, show them
+                    if (data.length > 0) {
+                        suggestionsBox.innerHTML = data.map(name => {
+                            return `<div class="suggestion-item">${name}</div>`;
+                        }).join('');
+                        suggestionsBox.style.display = 'block';
+                    } else {
+                        suggestionsBox.style.display = 'none'; // Hide if no results
+                    }
+     
+                    // Add click event on suggestion items
+                    suggestionsBox.addEventListener('click', function(event) {
+                        if (event.target.classList.contains('suggestion-item')) {
+                            inputField.value = event.target.textContent;
+                            suggestionsBox.style.display = 'none'; // Hide suggestions after selection
+                        }
+                    });
+                })
+                .catch(error => console.error('Error fetching suggestions:', error));
+        }
+    </script>
+</body>
+</html>

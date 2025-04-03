@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bills Management</title>
+  <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+    * {
+      font-family: 'Montserrat', serif;
+    }
+    .glass {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+  <link rel="stylesheet" href="/output.css">
+</head>
+<body class="bg-[#faf5ef] min-h-screen flex animate-fade-in">
+  <div class="fixed top-0 left-0 h-full w-[75px] bg-[#faf5ef] shadow-lg flex flex-col items-center justify-center">
+    <button onclick="location.href='/dashboard'" class="p-4">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-[#5b3e2d]">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1">
+    <h1 class="text-4xl font-light text-[#5b3e2d] text-center mt-6 p-6">
+      SHAH BHOGILAL BHURALAL SONS
+    </h1>
+    <div class="mt-6 flex items-center justify-center">
+      <div class="peer p-6 w-full glass flex flex-col items-center justify-center">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">List of Bills</h1>
+        <div class="m-6 w-full flex flex-col items-center justify-center">
+          <div class="mb-4 w-full max-w-4xl">
+            <input
+              type="text"
+              id="search-bar"
+              placeholder="Search items..."
+              class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-600 transition-all duration-300 ease-in-out"
+            />
+          </div>
+        </div>
+        <table class="table-auto w-full rounded-lg text-center">
+          <thead>
+            <tr class="text-[#5b3e2d]">
+              <th class="px-4 py-2 text-left">Bill NO.</th>
+              <th class="px-4 py-2">Date</th>
+              <th class="px-4 py-2">Customer</th>
+              <th class="px-4 py-2 hidden md:table-cell">Driver</th>
+              <th class="px-4 py-2">Total</th>
+              <th class="px-2 py-1">Details</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="bg-white">
+            <!-- Dynamic rows will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  
+    const tableBody = document.getElementById('table-body');
+    const searchBar = document.getElementById('search-bar');
+    let items = []; // Store fetched data globally
+
+    // Fetch and render items
+    fetch('/get/bill')
+      .then(response => response.json())
+      .then(data => {
+        items = data;
+        renderTable(items);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+
+    // Render table rows dynamically
+    function renderTable(data) {
+      const tableBody = document.getElementById('table-body');
+      const isLargeScreen = window.innerWidth > 768;
+
+      tableBody.innerHTML = data.map(bill => `
+        <tr class="border-b bg-[#faf5ef]">
+          <td class="px-4 py-2 text-left">${bill.bill_id}</td>
+          <td class="px-4 py-2 text-center">${bill.date}</td>
+          <td class="px-4 py-2 text-center">${bill.customer}</td>
+          ${isLargeScreen ? `<td class="px-4 py-2 text-center">${bill.driver}</td>` : ""}
+          <td class="px-4 py-2 text-center">${bill.total}</td>
+          <td class="px-4 py-2 text-center">
+            <button class="moreDetails rotate-0 hover:rotate-180 transition-all duration-300 ease-in-out" data-bill-id="${bill.bill_id}">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 ">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+        <tr class="detailsRow text-[#5b3e2d]" style="display: none;">
+          <td colspan="6">
+            <table class="table-auto w-full text-center border-collapse bg-[#fefcfb]">
+              <thead>
+                <tr class="bg-[#5b3e2d] font-normal text-[#fefcfb]">
+                  <th class="px-2 py-1">Item</th>
+                  <th class="px-2 py-1">Qty</th>
+                  <th class="px-2 py-1">Rate</th>
+                  <th class="px-2 py-1">Total</th>
+                </tr>
+              </thead>
+              <tbody class="item-list">
+                <!-- Bill item rows will be added here -->
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      `).join('');
+
+
+      // Add event listeners for "More Details" buttons after rendering
+      document.querySelectorAll(".moreDetails").forEach(button => {
+        button.addEventListener("click", function () {
+          const billId = this.getAttribute("data-bill-id");
+          // Get the detailsRow which is the next sibling of the current row
+          const detailsRow = this.closest("tr").nextElementSibling;
+          const svgElement = this.querySelector("svg");
+          // Get the container (tbody) where the bill items will be inserted
+          const listContainer = detailsRow.querySelector(".item-list");
+          // Clear any existing content in the container
+          listContainer.innerHTML = "";
+
+          // Fetch additional details for this bill
+          fetch(`/bill_item/${billId}`)
+            .then(response => response.json())
+            .then(data => {
+              // Loop through the fetched data and create table rows
+              for (let i = 0; i < data.length; i++) {
+                const tr = document.createElement('tr');
+              
+                const td1 = document.createElement('td');
+                td1.innerHTML = data[i].item;
+                tr.appendChild(td1);
+
+                const td2 = document.createElement('td');
+                td2.innerHTML = data[i].qty;
+                tr.appendChild(td2);
+
+                const td3 = document.createElement('td');
+                td3.innerHTML = data[i].rate;
+                tr.appendChild(td3);
+
+                const td4 = document.createElement('td');
+                td4.innerHTML = data[i].total;
+                tr.appendChild(td4);
+
+                // Append the row to the container
+                listContainer.appendChild(tr);
+              }
+            })
+            .catch(error => console.error('Error loading data', error));
+
+            
+
+          // Toggle the display of the details row and update the SVG arrow
+          if (detailsRow.style.display === "none" || detailsRow.style.display === "") {
+            detailsRow.style.display = "table-row";
+            svgElement.classlist.add("rotate-180");
+          } else {
+            detailsRow.style.display = "none";
+            svgElement.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />`;
+          }
+        });
+      });
+    }
+    
+
+    // Search bar event listener
+    searchBar.addEventListener('input', () => {
+      const query = searchBar.value.toLowerCase();
+      const filteredItems = items.filter(item =>
+        item.customer.toLowerCase().includes(query) ||
+        item.driver.toLowerCase().includes(query) ||
+        item.date.toLowerCase().includes(query) ||
+        item.bill_id.toString().toLowerCase().includes(query)
+      );
+      renderTable(filteredItems);
+    });
+
+    fetch('/get/bill')
+  .then(response => response.json())
+  .then(data => {
+    renderTable(data); // Initial table rendering
+
+    // Listen for window resize and re-render table dynamically
+    window.addEventListener("resize", () => renderTable(data));
+  })
+  .catch(error => console.error('Error fetching data:', error));
+  </script>
+</body>
+</html>

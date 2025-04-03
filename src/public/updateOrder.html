@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Order</title>
+    <link rel="stylesheet" href="/output.css">
+</head>
+<body class="bg-[#faf5ef] min-h-screen flex flex-col items-center justify-center">
+    <h1 class="mt-6 text-4xl tracking-widest font-light text-[#5b3e2d] text-center mb-6">
+        SHAH BHOGILAL BHURALAL SONS
+    </h1>
+    <div class="bg-white/50 backdrop-blur-md border border-white/30 shadow-lg rounded-lg p-6 w-full max-w-3xl">
+        <h2 class="text-2xl font-bold text-center text-[#5b3e2d] mb-6">Update Order</h2>
+        
+        <form id="billForm" action="/update" method="POST" class="space-y-4">
+            <input type="number" id="orderId" name="orderId" hidden>
+
+            <div class="flex flex-col">
+                <label for="customerName" class="text-sm font-medium text-gray-600">Customer Name</label>
+                <input readonly type="text" id="customerName" name="customerName" required 
+                    class="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+            </div>
+
+            <table class="w-full rounded-md">
+                <thead>
+                    <tr class="text-[#5b3e2d]">
+                        <th class="py-2 px-4">Item Name</th>
+                        <th class="py-2 px-4">Quantity</th>
+                        <th class="py-2 px-4 text-center">Remove</th> <!-- New Column for Remove Icon -->
+                    </tr>
+                </thead>
+                <tbody id="itemsTable">
+                    <tr id="item-list"></tr>
+                </tbody>
+            </table>
+            <div class="px-4 py-2 text-center">
+                <button type="submit" class="bg-[#319795] text-white px-4 py-2 rounded-md shadow-sm hover:bg-[#2c7a7b] transition-all duration-300 ease-in-out">
+                    Update
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const orderId = document.location.pathname.split('/').pop();
+
+fetch(`/set/billDetails/${orderId}`)
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('customerName').value = data[0].customer;
+        document.getElementById('orderId').value = orderId;
+
+        const List = document.getElementById('item-list');
+        data.forEach(entry => {
+            const tr = document.createElement('tr');
+            tr.classList.add("border-b");
+
+            // Item Name Column
+            const td1 = document.createElement('td');
+            td1.classList.add("py-2", "px-4");
+            const input1 = document.createElement('input');
+            input1.type = "text";
+            input1.name = "itemName";
+            input1.value = entry.item;
+            input1.readOnly = true;
+            input1.classList.add("w-full", "p-2", "border", "border-gray-300", "rounded-md");
+            td1.appendChild(input1);
+            tr.appendChild(td1);
+
+            // qty
+            const td2 = document.createElement('td');
+            td2.classList.add("py-2", "px-4");
+            const input2 = document.createElement('input');
+            input2.type = "number";
+            input2.name = "itemQty";
+            input2.value = entry.qty;
+            input2.classList.add("w-full", "p-2", "border", "border-gray-300", "rounded-md");
+            td2.appendChild(input2);
+            tr.appendChild(td2);
+
+            //remove
+            const td3 = document.createElement('td');
+            td3.classList.add("py-2", "px-4", "text-center");
+            const removeIcon = document.createElement("span");
+            removeIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                class="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer transition duration-300 ease-in-out">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>`;
+
+                removeIcon.onclick = function () {
+                    fetch(`/delete/item/${orderId}/${entry.item}`, {
+                        method: "DELETE",
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.redirect) {
+                            alert(data.message); 
+                            window.location.href = data.redirect;  
+                        } else if (data.message) {
+                            alert(data.message);
+                            tr.remove();  
+                        } else {
+                            alert("Error: " + data.error);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+                };
+                
+
+            td3.appendChild(removeIcon);
+            tr.appendChild(td3);
+
+            List.parentNode.appendChild(tr);
+        });
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+    </script>
+</body>
+</html>

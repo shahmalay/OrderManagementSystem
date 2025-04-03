@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Generation Form</title>
+    <link rel="stylesheet" href="/output.css">
+  
+    <style>
+            @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+        * {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .glass {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-[#faf5ef] flex items-center justify-center min-h-screen">
+    <div class="glass w-full mx-auto p-6">
+        <h2 class="text-4xl font-normal tracking-[5px] text-center text-[#5b3e2d] mb-6">SHAH BHOGILAL BHURALAL SONS</h2>
+
+        <form id="billForm" action="/submit/bill" method="post" class="space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="billDate" class="block text-gray-600 font-medium">Date</label>
+                    <input type="date" id="billDate" name="billDate" readonly
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-teal-200">
+                </div>
+                <input type="hidden" id="userId" name="userId">
+                <input type="hidden" id="orderId" name="orderId">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="driverName" class="block text-gray-600 font-medium">Driver Name</label>
+                    <input type="text" id="driverName" name="driverName" required
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-teal-200">
+                </div>
+                <div>
+                    <label for="vehicleNumber" class="block text-gray-600 font-medium">Vehicle Number</label>
+                    <input type="text" id="vehicleNumber" name="vehicleNumber" required
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-teal-200">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="customerName" class="block text-gray-600 font-medium">Customer Name</label>
+                    <input type="text" id="customerName" name="customerName" readonly
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-teal-200">
+                </div>
+                <div>
+                    <label for="customerAddress" class="block text-gray-600 font-medium">Customer Address</label>
+                    <input type="text" id="customerAddress" name="customerAddress" readonly
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-teal-200">
+                </div>
+            </div>
+            <div class="w-full max-w-full">
+                <table id="itemsTable" class="table-fixed w-full border text-center">
+                    <thead>
+                        <tr>
+                            <th class="px-2 py-1 w-1/6">Item Name</th>
+                            <th class="px-2 py-1">Weight (kg)</th>
+                            <th class="px-2 py-1" >Quantity</th>
+                            <th class="px-2 py-1">Rate</th>
+                            <th class="px-2 py-1 hidden md:table-cell">CGST (%)</th>
+                            <th class="px-2 py-1 hidden md:table-cell">SGST (%)</th>
+                            <th class="px-2 py-1">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="item-list" class="text-center"></tbody>
+                </table>
+            </div>
+            
+            <div>
+                <label for="grandTotal" class="block text-gray-600 font-medium">Grand Total</label>
+                <input type="number" id="grandTotal" name="grandTotal" readonly
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-0">
+            </div>
+            <div class="flex flex-col items-center">
+
+            <button type="submit"
+                    class="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition duration-300">Generate Bill</button>
+            </div>
+                </form>
+    </div>
+
+    <script>
+        // Set order ID from URL
+        const orderId = document.location.pathname.split('/').pop();
+        document.getElementById("billDate").value = new Date().toISOString().split('T')[0];
+    
+        // Fetch order details
+        fetch(`/set/billDetails/${orderId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('customerName').value = data[0].customer;
+                document.getElementById('customerAddress').value = data[0].address;
+                document.getElementById('userId').value = data[0].user_id;
+                document.getElementById('orderId').value = data[0].order_id;
+                let lowStockItems = [];
+    
+                data.forEach(entry => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-2 py-1">
+                            ${entry.item}
+                            <input type="hidden" name="itemName[]" value="${entry.item}">
+                        </td>
+                        <td class="px-2 py-1">
+                            ${entry.weight}
+                            <input type="hidden" name="weight[]" value="${entry.weight}">
+                        </td>
+                        <td class="px-2 py-1">
+                            ${entry.qty}
+                            <input type="hidden" name="itemQty[]" value="${entry.qty}">
+                            <input type="hidden" name="itemStock[]" value="${entry.stock}">
+                        </td>
+                        <td class="px-2 py-1">
+                            <input type="number" class="rate w-full border p-1 rounded" 
+                                placeholder="Enter Rate" name="ratePerKg[]" required>
+                        </td>
+                        <td class="px-2 py-1 hidden md:table-cell">
+                            ${entry.cgst}
+                            <input type="hidden" name="cgst[]" value="${entry.cgst}">
+                        </td>
+                        <td class="px-2 py-1 hidden md:table-cell">
+                            ${entry.sgst}
+                            <input type="hidden" name="sgst[]" value="${entry.sgst}">
+                        </td>
+                        <td class="px-2 py-1">
+                            <input type="number" name="itemTotal[]" class="total w-full bg-transparent text-center" value="0.00" readonly>
+                        </td>
+                    `;
+                    document.getElementById('item-list').appendChild(tr);
+                    if (entry.stock < entry.qty) {
+                        lowStockItems.push(entry.item);
+                    }
+                });
+    
+                document.querySelectorAll('.rate').forEach(input => {
+                    input.addEventListener('input', updateTotals);
+                });
+    
+                function updateTotals() {
+                    let grandTotal = 0; 
+    
+                    document.querySelectorAll('#itemsTable tbody tr').forEach(row => {
+                        const rate = parseFloat(row.querySelector('[name="ratePerKg[]"]').value) || 0;
+                        const qty = parseFloat(row.children[2].innerText) || 0;
+                        const weight = parseFloat(row.children[1].innerText) || 0;
+                        const stock = parseFloat(row.querySelector('[name="itemStock[]"]').value) || 0;
+                        const cgst = parseFloat(row.children[4].innerText) || 0; 
+                        const sgst = parseFloat(row.children[5].innerText) || 0; 
+
+    
+                        let total = rate * qty * weight;
+                        total += (total * (cgst + sgst)) / 100; // Adding CGST & SGST
+    
+                        row.querySelector('[name="itemTotal[]"]').value = total.toFixed(2);
+                        grandTotal += total;
+                    });
+    
+                    document.getElementById('grandTotal').value = grandTotal.toFixed(2);
+    
+                }
+                if (lowStockItems.length > 0) {
+                    alert(`⚠️ Stock is low for: ${lowStockItems.join(", ")}`);
+                }
+            });
+    </script>
+    
+
+
+
+</body>
+</html>

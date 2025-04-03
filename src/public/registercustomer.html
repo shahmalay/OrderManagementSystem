@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/output.css">
+  <title>Registration Page</title>
+</head>
+
+<body>
+    <section class="bg-gray-200 h-screen flex items-center justify-center">
+  <!-- Main Container -->
+    <div class="w-1/2 lg:w-1/2 px-8 py-16">
+        <h2 class="text-xl font-semibold text-gray-700 text-center">REGISTER NEW CUSTOMER</h2>
+        
+        <p class="text-sm text-gray-500 text-center mt-1">Welcome! To The Family</p>
+  
+        <form class="mt-8 space-y-6" action="/registercustomer" method="POST">
+          <!-- Username Field -->
+          <div class="relative">
+            <input 
+              type="text" 
+              id="customer" 
+              pattern="^[A-Za-z\s]+$" 
+              title="Only letters and spaces are allowed"
+              name="customer"
+              placeholder=" " 
+              required 
+              class="peer w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
+            />
+            <label 
+              for="customer" 
+              class="absolute left-5 -top-7 text-gray-400 text-base transition-all duration-200 ease-in-out peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:text-rose-500"
+            >
+             Customer Name*
+            </label>
+          </div>
+          
+          <div class="relative">
+            <input 
+              type="email" 
+              id="email" 
+              name="email"
+              placeholder=" " 
+              required 
+              class="peer w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
+            />
+            <label 
+              for="email" 
+              class="absolute left-5 -top-7 text-gray-400 text-base transition-all duration-200 ease-in-out peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:text-rose-500"
+            >
+             Email*
+            </label>
+          </div>
+
+          <div class="relative">
+            <input 
+              type="tel" 
+              pattern="^[6-9]\d{9}$"
+              title = 'incorrect phone number'
+              id="phone_no" 
+              name="phone_no"
+              placeholder=" " 
+              class="peer w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
+            />
+            <label 
+              for="phone_no" 
+              class="absolute left-5 -top-7 text-gray-400 text-base transition-all duration-200 ease-in-out peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:text-rose-500"
+            >
+            Contact
+            </label>
+          </div>
+
+          <div class="relative">
+            <input 
+              pattern="^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z\d]{1}[A-Z\d]{1}$"
+              title = 'incorrect GST number'
+              type="text" 
+              id="gst" 
+              name="gst"
+              placeholder=" " 
+              class="peer w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
+            />
+            <label 
+              for="gst" 
+              class="absolute left-5 -top-7 text-gray-400 text-base transition-all duration-200 ease-in-out peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:text-rose-500"
+            >
+            GSTIN
+            </label>
+          </div>
+
+          <div class="relative">
+            <input 
+              type="text" 
+              id="address" 
+              name="address"
+              placeholder=" " 
+              class="peer w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
+            />
+            <label 
+              for="address" 
+              class="absolute left-5 -top-7 text-gray-400 text-base transition-all duration-200 ease-in-out peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:text-rose-500"
+            >
+             Address 
+            </label>
+          </div>
+          <!-- REGISTER Button -->
+           <div class="flex items-center justify-center">
+          <button type="submit" class="w-1/2 bg-white text-gray-500 py-3 rounded-lg font-medium text-sm hover:bg-rose-500 hover:text-white transition-all duration-500 ease-in-out">
+            REGISTER
+          </button>  
+          </div>        
+        </form>
+      </div>
+    </div>
+    <!--img-->
+    <div class="sm:block hidden w-full">
+      <div class="h-screen">
+        <img src="/login.jpg" class="h-screen w-full object-cover">
+        </div>
+      </div>
+    </div>  
+</section>
+</body>
+</html>

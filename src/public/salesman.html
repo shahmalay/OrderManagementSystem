@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Management</title>
+  <style>
+    * {
+      font-family: 'Montserrat', serif;
+    }
+
+    .glass {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+  <link rel="stylesheet" href="/output.css">
+</head>
+<body class="bg-[#faf5ef] min-h-screen flex animate-fade-in">
+  <!-- Sidebar -->
+  <div class="fixed top-0 left-0 h-full w-[75px] bg-[#faf5ef] shadow-lg flex flex-col items-center justify-center">
+    <button onclick="location.href='/dashboard'" class="p-4">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-[#5b3e2d]">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class=" flex-1">
+    <h1 class="sticky text-4xl font-light text-[#5b3e2d] text-center mt-6 p-6">
+      SHAH BHOGILAL BHURALAL SONS
+    </h1>
+    <div class="mt-6 flex items-center justify-center">
+      <div class="p-6 w-full max-w-4xl glass flex flex-col items-center justify-center">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">List of Salesmen</h1>
+        <div class=" w-full flex flex-col items-center justify-center">
+          <div class="mb-4 w-full max-w-4xl">
+            <input
+              type="text"
+              id="search-bar"
+              placeholder="Search items..."
+              class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-600"
+            />
+          </div>
+        </div>
+        
+        <table class="table-auto w-full rounded-lg text-center">
+          <thead>
+            <tr class="text-[#5b3e2d]">
+              <th class="px-4 py-2 text-left">Username</th>
+              <th class="px-4 py-2">E-mail</th>
+              <th class="px-4 py-2">Remove</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="bg-white">
+            <!-- Dynamic rows will be inserted here -->
+          </tbody>
+        </table>
+        <button 
+          class="mt-4 bg-teal-600 text-white px-6 py-2 rounded-lg text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-teal-700"
+        >
+          <a onclick="location.href='/sbbs/register'">Add Salesman</a>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    fetch('/get/salesman')
+      .then(response => response.json())
+      .then(data => {
+        const tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = data.map(
+          (user, index) => `
+            <tr class="border-b bg-[#faf5ef]">
+              <td class="px-4 py-2 text-left">${user.username}</td>
+              <td class="px-4 py-2 text-center">${user.email}</td>
+              <td class="px-4 py-2 flex items-center gap-2">
+                <form action="/delete/salesman/${user.user_id}" method="POST" class="text-center">
+                  <button class="bg-teal-600 text-white px-4 py-1 rounded-lg transition-all duration-300 ease-in-out hover:bg-teal-700" type="submit">
+                   Remove
+                  </button>
+                </form>
+              </td>
+            </tr>
+          `
+        ).join("");
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  </script>
+
+  <div id="toTop" class="group opacity-0 translate-x-[50px] bg-white rounded-full p-3 shadow-lg fixed bottom-5 right-5 transition-all duration-300 ease-in-out hover:bg-[#5b3e2d]" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#5b3e2d" class="peer size-6 stroke-[#5b3e2d] group-hover:stroke-white transition-all duration-300 ease-in-out">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+    </svg>  
+  </div>
+  <script>
+    const toTop = document.getElementById('toTop');
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      if (scrollY > 10) {
+        toTop.classList.add('opacity-100');
+        toTop.classList.add('translate-x-[0]');
+        toTop.classList.remove('opacity-0');
+        toTop.classList.remove('translate-x-[50px]');
+      } else {
+        toTop.classList.add('opacity-0');
+        toTop.classList.remove('opacity-100');
+        toTop.classList.add('translate-x-[50px]');
+        toTop.classList.remove('translate-x-[0]');
+      }
+    });
+  </script>
+   <script>
+    const tableBody = document.getElementById('table-body');
+    const searchBar = document.getElementById('search-bar');
+    let items = []; // To store fetched data globally
+  
+    // Fetch and render items
+    fetch('/get/salesman')
+      .then(response => response.json())
+      .then(data => {
+        items = data; // Store items globally
+        renderTable(data); // Render table with all items initially
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  
+    // Render table rows dynamically
+    function renderTable(data) {
+      tableBody.innerHTML = data.map(
+          (user, index) => `
+            <tr class="border-b bg-[#faf5ef]">
+              <td class="px-4 py-2 text-left">${user.username}</td>
+              <td class="px-4 py-2 text-center">${user.email}</td>
+              <td class="px-4 py-2 flex items-center gap-2">
+                <form action="/delete/salesman/${user.user_id}" method="POST" class="text-center">
+                  <button class="bg-teal-600 text-white px-4 py-1 rounded-lg transition-all duration-300 ease-in-out hover:bg-teal-700" type="submit">
+                   Remove
+                  </button>
+                </form>
+          </td>
+        </tr>
+      `).join('');
+    }
+  
+    // Search bar event listener
+    searchBar.addEventListener('input', () => {
+      const query = searchBar.value.toLowerCase();
+      const filteredItems = items.filter(item =>
+        item.username.toLowerCase().includes(query) ||
+        item.email.toLowerCase().includes(query)
+      );
+      renderTable(filteredItems);
+    });
+  </script>
+</body>
+</html>
