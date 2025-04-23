@@ -11,6 +11,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+
 function sendMail(to, sub, msg, path = null) {
   try {
     const mailOptions = {
@@ -33,4 +34,5 @@ function sendMail(to, sub, msg, path = null) {
     console.error("Error sending email:", error);
   }
 }
+
 export default sendMail;

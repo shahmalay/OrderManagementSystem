@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Management</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+    
     *{
         font-family: 'Montserrat', serif;
     }
@@ -21,14 +23,6 @@
 </head>
 <body class="bg-[#faf5ef] min-h-screen animate-fade-in">
   
-  <div class="fixed top-0 left-0 h-full w-[75px] bg-[#faf5ef] shadow-lg flex flex-col items-center justify-center">
-    <button onclick="location.href='/home'" class="p-4">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-[#5b3e2d]">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-      </svg>
-    </button>
-  </div>
-
     <h1 class="sticky text-4xl font-light text-[#5b3e2d] text-center mt-6 p-6">
         SHAH BHOGILAL BHURALAL SONS
       </h1>
@@ -48,18 +42,18 @@
     </div>
 
   
-    <table class="table-auto w-full rounded-lg text-center">
+    <table class="table-auto w-full lg:text-lg md:text-md sm:text-sm rounded-lg text-center">
       <thead>
         <tr class="text-[#5b3e2d]">
           <th class="px-4 py-2 text-left">Item Name</th>
-          <th class="px-4 py-2 ">weight (KG)</th>
-          <th class="px-4 py-2">Tax</th>
+          <th class="px-4 py-2 hidden md:table-cell ">weight (KG)</th>
+          <th class="px-4 py-2 hidden md:table-cell">Tax</th>
           <th class="px-4 py-2">Stock</th>
           <th class="px-4 py-2 ">booked</th>
         </tr>
       </thead>
       <tbody id="table-body" class="bg-white">
-        <!-- Dynamic rows will be inserted here -->
+        <!-- Dynamic rows -->
       </tbody>
     </table>
    
@@ -71,12 +65,13 @@
       .then(response => response.json())
       .then(data => {
         const tableBody = document.getElementById('table-body');
+        const isLargeScreen = window.innerWidth > 768;
         tableBody.innerHTML = data.map(
           (item, index) => `
             <tr class="border-b bg-[#faf5ef]">
               <td class="px-4 py-2 text-left">${item.item}</td>
-              <td class="px-4 py-2 text-center">${item.weight}</td>
-              <td class="px-4 py-2">${parseFloat(item.cgst) + parseFloat(item.sgst)}%</td>
+              ${isLargeScreen ? `<td class="px-4 py-2 text-center">${item.weight}</td>` : ""}
+              ${isLargeScreen ? `<td class="px-4 py-2">${parseFloat(item.cgst) + parseFloat(item.sgst)}%</td>` : ""}
               <td class="px-4 py-2 text-center">${item.stock}</td>
               <td class="px-4 py-2   text-center">${item.booked}</td>
             </tr>
@@ -85,6 +80,14 @@
         .join("");
     })
       .catch(error => console.error('Error fetching data:', error));
+
+      fetch('/get/item')
+  .then(response => response.json())
+  .then(data => {
+    renderTable(data); 
+    window.addEventListener("resize", () => renderTable(data));
+  })
+  .catch(error => console.error('Error fetching data:', error));
 </script>
 <div id="toTop" class="group opacity-0 translate-x-[50px] bg-white rounded-full p-3 shadow-lg fixed bottom-5 right-5 transition-all duration-300 ease-in-out hover:bg-[#5b3e2d]" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#5b3e2d" class="peer size-6 stroke-[#5b3e2d] group-hover:stroke-white transition-all duration-300 ease-in-out">
@@ -111,25 +114,25 @@
 <script>
   const tableBody = document.getElementById('table-body');
   const searchBar = document.getElementById('search-bar');
-  let items = []; // Global variable to store fetched data
+  let items = []; 
 
-  // Fetch items from the server
   fetch('/get/item')
     .then((response) => response.json())
     .then((data) => {
-      items = data; // Store the fetched data globally
-      renderTable(items); // Render the table with initial data
+      items = data; 
+      renderTable(items); 
     })
     .catch((error) => console.error('Error fetching data:', error));
 
-  // Function to render the table
   function renderTable(data) {
+    const tableBody = document.getElementById('table-body');
+        const isLargeScreen = window.innerWidth > 768;
     tableBody.innerHTML = data.map(
         (item) => `
           <tr class="border-b bg-[#faf5ef]">
             <td class="px-4 py-2 text-left">${item.item}</td>
-              <td class="px-4 py-2 text-center">${item.weight}</td>
-              <td class="px-4 py-2">${parseFloat(item.cgst) + parseFloat(item.sgst)}%</td>
+              ${isLargeScreen ? `<td class="px-4 py-2 text-center">${item.weight}</td>` : ""}
+              ${isLargeScreen ? `<td class="px-4 py-2">${parseFloat(item.cgst) + parseFloat(item.sgst)}%</td>` : ""}
               <td class="px-4 py-2 text-center">${item.stock}</td>
               <td class="px-4 py-2   text-center">${item.booked}</td>
           </tr>
@@ -137,16 +140,21 @@
       )
       .join('');
   }
+  fetch('/get/item')
+  .then(response => response.json())
+  .then(data => {
+    renderTable(data); 
+    window.addEventListener("resize", () => renderTable(data));
+  })
 
-  // Event listener for the search bar
   searchBar.addEventListener('input', () => {
-    const query = searchBar.value.toLowerCase(); // Convert the search query to lowercase
+    const query = searchBar.value.toLowerCase(); se
     const filteredItems = items.filter(
       (item) =>
-        item.item.toLowerCase().includes(query) || // Check item name
-        item.category.toLowerCase().includes(query) // Check category
+        item.item.toLowerCase().includes(query) || 
+        item.category.toLowerCase().includes(query) 
     );
-    renderTable(filteredItems); // Re-render the table with filtered data
+    renderTable(filteredItems); 
   });
 </script>
 

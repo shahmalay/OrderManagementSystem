@@ -14,14 +14,12 @@
 </head>
 <body>
     <section class="bg-[#faf5ef] h-screen flex items-center justify-center space-x-4">
-  <!-- Main Container -->
     <div class="w-full lg:w-1/2 px-8 py-16">
         <h2 class="text-xl font-semibold text-[#5b3e2d] text-center">SHAH BHOGILAL BHURALAL SONS</h2>
         
         <p class="text-sm text-[#5b3e2d] text-center mt-1">Welcome! Please enter your details.</p>
   
         <form class="mt-8 space-y-6" action="/" method="POST">
-          <!-- Username/Email Field -->
           <div class="relative">
             <input 
               type="text" 
@@ -33,14 +31,12 @@
             />
             <label 
               for="userid" 
-              class="absolute left-5 -top-7 text-[#5b3e2d] text-base transition-all duration-200 ease-in-out peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:text-[#5b3e2d] "
+              class="absolute left-5 -top-7 text-[#5b3e2d] text-base transition-all duration-300 ease-in-out peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:text-[#5b3e2d] "
             >
              Username/Email
             </label>
           </div>
-  
-          <!-- Password Field -->
-<div class="relative top-2">
+  <div class="relative top-2">
   <input 
     type="password" 
     id="password" 
@@ -64,15 +60,11 @@
     </svg>
   </button>
 </div>
-
-  
-          <!-- Remember Me and Forgot Password -->
-          <div class="flex items-center justify-between">
+          <div class="flex">
             
-            <a onclick="forgetPassword()" class=" text-sm text-blue-500 transition-all duration-500 ease-in-out hover:text-black">Forgot Password?</a>
+            <a onclick="forgetPassword()" class=" text-sm text-blue-500 transition-all duration-500 ease-in-out hover:text-black cursor-pointer">Forgot Password?</a>
           </div>
   
-          <!-- Login Button -->
            <div class="flex items-center justify-center">
           <button type="submit" class="w-1/2 bg-white text-gray-500 py-3 rounded-lg font-medium text-sm hover:bg-[#5b3e2d] hover:text-[#faf5ef] transition-all duration-500 ease-in-out">
             Log in
@@ -81,7 +73,6 @@
         </form>
       </div>
     </div>
-    <!--img-->
     <div class="sm:block hidden w-full">
       <div class="h-screen">
           <img src="/login.jpg" class="h-screen w-full object-cover">

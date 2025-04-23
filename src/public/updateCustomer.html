@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Update Customer Details</title>
   <link rel="stylesheet" href="/output.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+    *{
+       font-family: 'Montserrat', serif;
+    }
+  </style>
 </head>
 <body class="bg-[#faf5ef] min-h-screen flex flex-col items-center justify-center">
   <h1 class="mt-6 text-4xl tracking-widest font-light text-[#5b3e2d] text-center mb-6">
@@ -17,7 +23,7 @@
     <form id="updateForm" class="space-y-4" method="POST">
       <div>
         <label for="customer" class="block text-[#5b3e2d] font-semibold">Customer Name</label>
-        <input id="customer" name="customer" type="text" pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#319795] focus:outline-none" required />
+        <input id="customer" name="customer" type="text" pattern="^[A-Za-z]+(\s[A-Za-z]+)*$" title="Only letters and spaces are allowed" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#319795] focus:outline-none" required />
       </div>
       <div>
         <label for="address" class="block text-[#5b3e2d] font-semibold">Address</label>
@@ -33,7 +39,7 @@
       </div>
       <div>
         <label for="gst" class="block text-[#5b3e2d] font-semibold">GST Number</label>
-        <input id="gst" name="gst" type="text" pattern="^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z\d]{1}[A-Z\d]{1}$" title = 'incorrect GST number' class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#319795] focus:outline-none"  />
+        <input id="gst" name="gst" type="text" pattern="^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z\d]{1}[A-Z\d]{1}$" title="GST pattern 12ABCDE1234A1A1" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#319795] focus:outline-none"  />
       </div>
       <div class="text-center">
         <button type="submit" class="bg-[#319795] text-white px-6 py-2 rounded-md shadow-sm hover:bg-[#2c7a7b] transition-all">
@@ -44,6 +50,7 @@
   </div>
 
   <script>
+    
     document.addEventListener("DOMContentLoaded", function () {
       const urlParams = new URLSearchParams(window.location.search);
       const custId = urlParams.get("cust_id");

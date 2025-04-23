@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="stylesheet" href="output.css">
+  <title>Admin Page</title> 
+  <style>
+    *{
+       font-family: 'Montserrat', serif;
+    }
+  .glass {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+</style>
+</head>
+<body class="bg-[#faf5ef] animate-fade-in">
+  <!-- Container -->
+  <div class="container mx-auto px-6 py-12">
+
+    <!-- Heading -->
+    <h1 class="text-4xl font-light text-[#5b3e2d] text-center tracking-[5px] mb-12">
+      SHAH BHOGILAL BHURALAL SONS
+    </h1>
+
+    <!-- Grid Layout -->
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"> 
+      <div class="glass md:col-span-1 bg-white/40 rounded-lg p-6 flex flex-col justify-center items-center border border-white/30">
+        <div class="w-full justify-center items-center flex flex-col gap-4">
+          <a href="stock.html" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-teal-600  hover:text-white transition duration-300 text-center">
+            Item
+          </a>
+          <a href="charts.html" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-teal-600 hover:text-white transition duration-300 text-center">
+            Sales
+          </a>
+          <a href="salesman.html" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-teal-600 hover:text-white transition duration-300 text-center">
+            Salesman
+          </a>
+          <a href="bill_list.html" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-teal-600 hover:text-white transition duration-300 text-center">
+            Bills
+          </a>
+          <a href="customer.html" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-teal-600 hover:text-white transition duration-300 text-center">
+            Customer
+          </a>
+          <a href="updateProfile.html" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-teal-600 hover:text-white transition duration-300 text-center">
+            Update Profile
+          </a>
+          <button onclick="Logout()" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-teal-600 hover:text-white transition duration-300">
+            Logout
+          </button>           
+        </div>
+      </div>
+      
+
+      <!-- Right Grid Cards -->
+      <div id="orderData" class="sm:col-span-1 md:col-span-2 lg:col-span-3 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Square Card 1 -->
+         
+      
+       
+      </div>
+    </div>
+  </div>
+<script>
+  function Logout() {
+    fetch('/logout', { method: 'GET' })
+        .then(response => {
+            if (response.ok) {
+                sessionStorage.clear();
+                localStorage.clear();
+                window.location.href = '/';
+            } else {
+                alert('Logout failed');
+            }
+        })
+        .catch(error => console.error('Error logging out:', error));
+}
+
+  fetch('/get/order')
+      .then(response => response.json())
+      .then(data => {
+        const List = document.getElementById('orderData');
+        data.forEach(order => {
+          const div = document.createElement('div');
+          const h3 = document.createElement('h3');
+          const p = document.createElement('p');
+          const a = document.createElement('a');
+
+          // div.classList.add('glass', 'shadow-md', 'rounded-lg', 'p-6', 'flex', 'flex-col', 'justify-center', 'items-center', 'group');
+          div.classList='glass shadow-md rounded-lg p-6 flex flex-col justify-center items-center group';
+          h3.classList.add('text-lg', 'font-semibold', 'text-gray-800', 'transition-all', 'duration-300', 'group-hover:tracking-[2px]', 'uppercase');
+          p.classList.add('text-gray-600', 'mt-4', 'mb-4', 'text-sm', 'text-center');
+          a.classList.add('w-full', 'md:w-[200px]', 'px-4', 'py-2', 'bg-gray-100', 'text-gray-800', 'rounded-lg', 'border', 'border-gray-300', 'shadow-sm', 'hover:bg-teal-600', 'hover:text-white', 'transition', 'duration-300', 'text-center');
+          div.appendChild(h3);
+          div.appendChild(p);
+          div.appendChild(a);
+
+          
+          h3.textContent = `${order.customer}` ;
+          p.innerHTML = `NOTE : ${order.note} <br> DATE : ${order.date} <br> BY : ${order.username}`;
+            a.textContent = 'Generate Bill';
+            a.classList.add('w-[200px]', 'px-4', 'py-2', 'bg-gray-100', 'text-gray-800', 'rounded-lg', 'border', 'border-gray-300', 'shadow-sm', 'hover:bg-teal-600', 'hover:text-white', 'transition', 'duration-300');
+            a.href = `/generate/bill/${order.order_id}`;
+            //button.onclick = () => {
+            //  fetch(`/generate/bill/${order.order_id}`, { method: 'GET' })
+            //  .then(response => {
+            //  if (!response.ok) {
+            //  alert('Failed to generate bill');
+            //  }
+            //  })
+            //  .catch(error => console.error('Error generating bill:', error));
+            //};
+          List.appendChild(div);
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+</script>
+
+
+
+</body>
+</html>

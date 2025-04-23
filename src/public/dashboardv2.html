@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/output.css">
+  <title>Admin Page</title> 
+  <style>
+    *{
+       font-family: 'Montserrat', serif;
+    }
+  .glass {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .flip-card {
+      perspective: 1000px;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+    .flip-card:hover .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    .flip-card-front {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .flip-card-back {
+      background: rgba(255, 255, 255, 0.9);
+      transform: rotateY(180deg);
+      flex-direction: column;
+      text-align: center;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body class="bg-[#faf5ef] animate-fade-in">
+  <div class="container mx-auto px-6 py-12 relative">
+    <div class="flex justify-between items-center mb-12">
+      <h1 class="text-4xl font-light text-[#5b3e2d] tracking-[5px]">
+        SHAH BHOGILAL BHURALAL SONS
+      </h1>
+      <!-- Profile Box -->
+      <div id="profileBox" class="bg-white/40 rounded-lg p-4 shadow-md text-center w-60 border border-[#5b3e2d]">
+        <h3 id="username" class="text-lg font-semibold text-gray-800"></h3>
+        <p id="userType" class="text-gray-600 text-sm"></p>
+      </div>
+    </div>
+    
+    <!-- Grid Layout -->
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"> 
+      <div class="glass md:col-span-1 bg-white/40 rounded-lg p-6 flex flex-col justify-center items-center border border-white/30">
+        <div class="w-full justify-center items-center flex flex-col gap-4">
+          <a onclick="location.href='/sbbs/stock'" class="btn">Item</a>
+          <a onclick="location.href='/sbbs/salesman'" class="btn">Salesman</a>
+          <a onclick="location.href='/sbbs/bill_list'" class="btn">Bills</a>
+          <a onclick="location.href='/sbbs/customer'" class="btn">Customer</a>
+          <a onclick="location.href='/sbbs/updateProfile'" class="btn">Update Profile</a>
+          <a onclick="location.href='/sbbs/charts'" class="btn">Stats</a>
+          <button onclick="Logout()" class="btn">Logout</button>
+        </div>
+      </div>
+      
+      <div id="orderData" class="sm:col-span-1 md:col-span-2 lg:col-span-3 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      </div>
+    </div>
+  </div>
+
+<script>
+  function Logout() {
+    fetch('/logout', { method: 'GET' })
+        .then(response => {
+            if (response.ok) {
+                sessionStorage.clear();
+                localStorage.clear();
+                window.location.href = '/';
+            } else {
+                alert('Logout failed');
+            }
+        })
+        .catch(error => console.error('Error logging out:', error));
+  }
+
+  fetch('/get/order')
+      .then(response => response.json())
+      .then(data => {
+        const List = document.getElementById('orderData');
+        data.forEach(order => {
+          const div = document.createElement('div');
+          div.classList = 'flip-card';
+          div.innerHTML = `
+            <div class="flip-card-inner">
+              <div class="flip-card-front p-6 text-lg font-semibold text-gray-800">
+                <h2 class="font-medium uppercase tracking-[2px]">${order.customer}</h2>
+              </div>
+              <div class="flip-card-back">
+                <p class='text-gray-600 text-sm'>NOTE: ${order.note}</p>
+                <p class='text-gray-600 text-sm'>DATE: ${order.date}</p>
+                <p class='text-gray-600 text-sm'>BY: ${order.username}</p>
+                <a href='/generate/bill/${order.order_id}' class='mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition'>Generate Bill</a>
+              </div>
+            </div>
+          `;
+          List.appendChild(div);
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+      
+  fetch(`/get/profile`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('username').textContent = data.username;
+        document.getElementById('userType').textContent = data.user_type;
+      })
+      .catch(error => console.error('Error fetching profile:', error));
+</script>
+
+<style>
+  .btn {
+    width: 100%;
+    max-width: 200px;
+    padding: 8px 16px;
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    text-align: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .btn:hover {
+    background-color: #16a34a;
+    color: white;
+  }
+</style>
+</body>
+</html>

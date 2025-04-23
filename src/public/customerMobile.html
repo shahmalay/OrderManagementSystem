@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/output.css">
+  <title>Customer Management</title> 
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .card-container {
+      width: 100%;
+      height: 200px;
+      position: relative;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .card {
+      width: 100%;
+      height: 200px;
+      border-radius: inherit;
+    }
+
+    .card .front-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.6s ease-in-out;
+    }
+
+    .card .front-content h3 {
+      font-size: 22px;
+      text-transform: uppercase;
+      background: #5b3e2d;
+      background-clip: text;
+      letter-spacing: 5px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .card .content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 10px;
+      background: #5b3e2d;
+      color: #faf5ef;
+      padding: 20px;
+      border-radius: 5px;
+      transform: translateY(96%);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .card:hover .content {
+      transform: translateY(0);
+      background: #faf5ef;
+      color: #5b3e2d;
+    }
+
+    .card:hover .front-content {
+      transform: translateY(-30%);
+    }
+
+    .card:hover .front-content h3 {
+      opacity: 0;
+      letter-spacing: 0;
+    }
+
+  </style>
+</head>
+<body class="bg-[#faf5ef] animate-fade-in">
+
+  <div class="container mx-auto px-6 py-12">
+    <h1 class="text-4xl font-light text-[#5b3e2d] text-center tracking-[5px] mb-12">
+      SHAH BHOGILAL BHURALAL SONS
+    </h1>
+
+    <div class="w-full flex justify-center mb-6">
+      <input type="text" id="search-bar" placeholder="Search customers..."
+        class="w-full max-w-md border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-600 transition-all duration-300 ease-in-out">
+    </div>
+
+    <div id="customerData" class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- dynamic cards -->
+    </div>
+
+    <div class="flex justify-center mt-6">
+      <button class="bg-teal-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-teal-700 transition duration-300"
+        onclick="location.href='/sbbs/registercustomer'">Add Customer</button>
+    </div>
+  </div>
+
+  <script>
+    let customers = [];
+
+    fetch('/get/customer')
+      .then(response => response.json())
+      .then(data => {
+        customers = data;
+        renderCustomers(customers);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+
+    // dynamic cards
+    function renderCustomers(data) {
+      const container = document.getElementById('customerData');
+      container.innerHTML = data.map(customer => `
+        <div class="card-container">
+          <div class="card">
+            <div class="front-content">
+              <h3 class="font-normal text-center">${customer.customer}</h3>
+            </div>
+            <div class="content">
+              <p>Email: ${customer.email || 'N/A'}</p>
+              <p>Phone: ${customer.phone_no}</p>
+              <p>GST: ${customer.gst}</p>
+              <p>Address: ${customer.address || 'N/A'}</p>
+              
+              <svg onclick="location.href='/sbbs/updateCustomer?cust_id=${customer.cust_id}'"
+                xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                class="bi bi-pencil-square cursor-pointer hover:text-gray-700 transition-all duration-300"
+                viewBox="0 0 16 16">
+                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Searchbar
+    document.getElementById('search-bar').addEventListener('input', () => {
+      const query = document.getElementById('search-bar').value.toLowerCase();
+      const filteredCustomers = customers.filter(customer =>
+        customer.customer.toLowerCase().includes(query)
+      );
+      renderCustomers(filteredCustomers);
+    });
+
+  </script>
+
+</body>
+</html>

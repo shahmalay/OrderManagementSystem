@@ -186,8 +186,7 @@ fetch('/get/item')
     const query = searchBar.value.toLowerCase(); // Convert the search query to lowercase
     const filteredItems = items.filter(
       (item) =>
-        item.item.toLowerCase().includes(query) || // Check item name
-        item.category.toLowerCase().includes(query) // Check category
+        item.item.toLowerCase().includes(query)
     );
     renderTable(filteredItems); // Re-render the table with filtered data
   });

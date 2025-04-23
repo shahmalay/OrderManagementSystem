@@ -1,5 +1,5 @@
 import db from './connect.js';
-import express from 'express';
+import express, { query } from 'express';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import path from 'path';
@@ -74,7 +74,7 @@ app.post('/', (req, res) => {
   const isEmail = userid.endsWith('.com');
   const queryField = isEmail ? 'email' : 'username';
 
-  db.get(`SELECT * FROM user WHERE LOWER(${queryField}) = ?`, [userid.toLowerCase()], function (err, row) {
+  db.get(`SELECT * FROM user WHERE ${queryField} = ?`, [userid.toLowerCase()], function (err, row) {
     if (err) {
       console.error('Error retrieving from table:', err.message);
       res.status(500).send('Internal server error');
@@ -194,7 +194,7 @@ app.get('/get/item',isAuthenticated, (req, res) => {
 // add item
 app.post('/newitem',isAuthenticated,isAdmin, (req, res) => {
   const { item, weight, cgst, sgst, stock, category } = req.body;
-  db.run(`INSERT INTO item (item, weight, cgst, sgst, stock, booked,category) VALUES (?, ?, ?, ?, ?, ?, ?)`, [item, weight, cgst, sgst, stock, 0, category], function (err) {
+  db.run(`INSERT INTO item (item, weight, cgst, sgst, stock, booked,category) VALUES (?, ?, ?, ?, ?, ?, ?)`, [item, weight, cgst, sgst, stock, '0', category], function (err) {
     if (err) {
       console.error('Error inserting into table:', err.message);
       res.status(500).send('Internal server error');
@@ -221,7 +221,7 @@ app.post('/add/purchase/:id',isAuthenticated,isAdmin,(req,res)=>{
 // add customer
 app.post('/registercustomer',isAuthenticated, (req, res) => {
   const { customer, email, phone_no, gst, address} = req.body;
-  db.run(`INSERT INTO customer ( customer, address, gst, email, phone_no ) VALUES (?, ?, ?, ?, ?)`, [customer,address, gst.toUpperCase(), email, phone_no], function (err) {
+  db.run(`INSERT INTO customer ( customer, address, gst, email, phone_no ) VALUES (?, ?, ?, ?, ?)`, [customer,address || "", gst.toUpperCase() || "", email, phone_no || ""], function (err) {
     if (err) {
       console.error('Error inserting into table:', err.message);
       const isadmin = req.session.user.type == 'Admin';
@@ -362,7 +362,6 @@ app.post('/submit/order',isAuthenticated,isSalesman, (req, res) => {
                     }
                     return;
                   }
-
                   db.run(`UPDATE item SET booked = booked + ? WHERE item_id = ?`, [currentQuantity, item_id], function (err) {
                     if (err) {
                       console.error('Error updating item quantity:', err.message);
@@ -376,7 +375,6 @@ app.post('/submit/order',isAuthenticated,isSalesman, (req, res) => {
                 });
               });
             };
-
             insertOrderItems(0);
           });
         });
@@ -633,8 +631,9 @@ app.post('/submit/bill', isAuthenticated, isAdmin, (req, res) => {
 // Genrate Jwt Token & Mail
 app.post('/forget/password/:userid', (req, res) => {
   const { userid } = req.params;
+ 
   const field = userid.endsWith('.com') ? 'email' : 'username';
-  db.get(`SELECT * FROM user WHERE ${field} = ?`, [userid], (err, row) => {
+  db.get(`SELECT * FROM user WHERE ${field} = ? `, [userid], (err, row) => {
     if (err) {
       console.error('Error fetching user:', err.message);
       res.status(500).send('Internal server error');
@@ -768,7 +767,7 @@ app.post('/update/customer/:id',isAuthenticated,isAdmin, (req, res) => {
       res.status(500).send('Internal server error');
       return;
     }
-  res.status(200).send('<script>alert("Customer updated successfully"); location.href = "/sbbs/customer";</script>');
+  res.status(200).send('<script>alert("Customer updated successfully"); location.href ="/sbbs/customer";</script>');
   });
 });
 

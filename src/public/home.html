@@ -6,6 +6,8 @@
   <link rel="stylesheet" href="/output.css">
   <title>Salesman Page</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+    
     *{
        font-family: 'Montserrat', serif;
     }
@@ -101,34 +103,29 @@
 
 </head>
 <body class="bg-[#faf5ef]">
-  <!-- Container -->
-  <div class="container mx-auto px-6 py-12 relative">
+  <div class="container mx-auto px-6 py-12">
     <div class="flex justify-between items-center mb-12">
       <h1 class="text-4xl font-light text-[#5b3e2d] tracking-[5px]">
         SHAH BHOGILAL BHURALAL SONS
       </h1>
-      <!-- Profile Box -->
       <div id="profileBox" class="bg-white/40 rounded-lg p-4 shadow-md text-center w-60 border border-[#5b3e2d]">
         <h3 id="username" class="text-lg font-semibold text-gray-800"></h3>
+        <p id="userType" class="text-gray-600 text-sm"></p>
       </div>
     </div>
-
-    <!-- Grid Layout -->
     <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      
-      <!-- Left Rectangle Card -->
-      <div class="glass md:col-span-1 bg-white/40 backdrop-blur-md shadow-lg rounded-lg p-6 flex flex-col justify-center items-center border border-white/30">
+            <div class="glass md:col-span-1 bg-white/40 backdrop-blur-md shadow-lg rounded-lg p-6 flex flex-col justify-center items-center border border-white/30">
         <div class="w-full justify-center items-center flex flex-col gap-4">
-            <a href="/sbbs/order" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
+            <a onclick="location.href='/sbbs/order'" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
                 Create Order
               </a>
-          <a href="/sbbs/salesmanStock" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
+          <a onclick="location.href='/sbbs/salesmanStock'" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
             Stock
           </a>
-          <a href="/sbbs/salesmanCustomer" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
+          <a onclick="custRedir()" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
             Customer
           </a>
-          <a href="/sbbs/updateProfile" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
+          <a onclick="location.href='/sbbs/updateProfile'" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300 text-center">
             Update Profile
           </a>
           <button onclick="Logout()" class="w-full md:w-[200px] px-4 py-2 bg-gray-100 text-gray-800 rounded-lg border border-gray-300 shadow-sm hover:bg-green-600 hover:text-white transition duration-300">
@@ -138,13 +135,22 @@
       </div>
       
 
-      <!-- Right Grid Cards -->
+      <!-- dynamic Cards -->
       <div id="orderData" class="sm:col-span-1 md:col-span-2 lg:col-span-3 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
       </div>
     </div>
   </div>
 <script>
+
+function custRedir(){
+  if (window.innerWidth <= 768) {
+    window.location.href = '/sbbs/salesmanCustomerMobile';
+  } else {
+    window.location.href = '/sbbs/salesmanCustomer';
+  }
+}
+
   function Logout() {
     fetch('/logout', { method: 'GET' })
         .then(response => {
@@ -188,7 +194,6 @@ fetch('/get/order')
         document.getElementById('userType').textContent = data.user_type;
       })
       .catch(error => console.error('Error fetching profile:', error));
-
     </script>
     
 </body>

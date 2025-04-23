@@ -38,7 +38,8 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label for="driverName" class="block text-gray-600 font-medium">Driver Name</label>
-                    <input type="text" id="driverName" name="driverName" required
+                    <input type="text" id="driverName" name="driverName" required pattern="^[A-Za-z]+(\s[A-Za-z]+)*$"
+                            title="Only alphabets and spaces are allowed"
                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-teal-200">
                 </div>
                 <div>
@@ -64,9 +65,9 @@
                 <table id="itemsTable" class="table-fixed w-full border text-center">
                     <thead>
                         <tr>
-                            <th class="px-2 py-1 w-1/6">Item Name</th>
-                            <th class="px-2 py-1">Weight (kg)</th>
-                            <th class="px-2 py-1" >Quantity</th>
+                            <th class="px-2 py-1 w-1/6">Item</th>
+                            <th class="px-2 py-1">Weight</th>
+                            <th class="px-2 py-1" >Qty</th>
                             <th class="px-2 py-1">Rate</th>
                             <th class="px-2 py-1 hidden md:table-cell">CGST (%)</th>
                             <th class="px-2 py-1 hidden md:table-cell">SGST (%)</th>
@@ -91,92 +92,83 @@
     </div>
 
     <script>
-        // Set order ID from URL
         const orderId = document.location.pathname.split('/').pop();
         document.getElementById("billDate").value = new Date().toISOString().split('T')[0];
-    
-        // Fetch order details
+
         fetch(`/set/billDetails/${orderId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('customerName').value = data[0].customer;
-                document.getElementById('customerAddress').value = data[0].address;
-                document.getElementById('userId').value = data[0].user_id;
-                document.getElementById('orderId').value = data[0].order_id;
-                let lowStockItems = [];
-    
-                data.forEach(entry => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="px-2 py-1">
-                            ${entry.item}
-                            <input type="hidden" name="itemName[]" value="${entry.item}">
-                        </td>
-                        <td class="px-2 py-1">
-                            ${entry.weight}
-                            <input type="hidden" name="weight[]" value="${entry.weight}">
-                        </td>
-                        <td class="px-2 py-1">
-                            ${entry.qty}
-                            <input type="hidden" name="itemQty[]" value="${entry.qty}">
-                            <input type="hidden" name="itemStock[]" value="${entry.stock}">
-                        </td>
-                        <td class="px-2 py-1">
-                            <input type="number" class="rate w-full border p-1 rounded" 
-                                placeholder="Enter Rate" name="ratePerKg[]" required>
-                        </td>
-                        <td class="px-2 py-1 hidden md:table-cell">
-                            ${entry.cgst}
-                            <input type="hidden" name="cgst[]" value="${entry.cgst}">
-                        </td>
-                        <td class="px-2 py-1 hidden md:table-cell">
-                            ${entry.sgst}
-                            <input type="hidden" name="sgst[]" value="${entry.sgst}">
-                        </td>
-                        <td class="px-2 py-1">
-                            <input type="number" name="itemTotal[]" class="total w-full bg-transparent text-center" value="0.00" readonly>
-                        </td>
-                    `;
-                    document.getElementById('item-list').appendChild(tr);
-                    if (entry.stock < entry.qty) {
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('customerName').value = data[0].customer;
+        document.getElementById('customerAddress').value = data[0].address;
+        document.getElementById('userId').value = data[0].user_id;
+        document.getElementById('orderId').value = data[0].order_id;
+        let lowStockItems = [];
+        
+        data.forEach(entry => {
+            const tr = document.createElement('tr');
+tr.innerHTML = `
+    <td class="px-2 py-1">
+        ${entry.item}
+        <input type="hidden" name="itemName[]" value="${entry.item}">
+    </td>
+    <td class="px-2 py-1">
+        ${entry.weight}
+        <input type="hidden" name="weight[]" value="${entry.weight}">
+    </td>
+    <td class="px-2 py-1">
+        ${entry.qty}
+        <input type="hidden" name="itemQty[]" value="${entry.qty}">
+    </td>
+    <td class="px-2 py-1">
+        <input type="number"  min="0" class="rate w-full border p-1 rounded" 
+            placeholder="Enter Rate" name="ratePerKg[]" required>
+    </td>
+    <td class="px-2 py-1 hidden md:table-cell">
+        ${entry.cgst}
+        <input type="hidden" name="cgst[]" value="${entry.cgst}">
+    </td>
+    <td class="px-2 py-1 hidden md:table-cell">
+        ${entry.sgst}
+        <input type="hidden" name="sgst[]" value="${entry.sgst}">
+    </td>
+    <td class="px-2 py-1">
+        <input type="number" name="itemTotal[]" class="total w-full bg-transparent text-center" value="0.00" readonly>
+    </td>
+`;
+
+            document.getElementById('item-list').appendChild(tr);
+            if (entry.stock < entry.qty) {
                         lowStockItems.push(entry.item);
                     }
-                });
-    
-                document.querySelectorAll('.rate').forEach(input => {
-                    input.addEventListener('input', updateTotals);
-                });
-    
-                function updateTotals() {
-                    let grandTotal = 0; 
-    
-                    document.querySelectorAll('#itemsTable tbody tr').forEach(row => {
-                        const rate = parseFloat(row.querySelector('[name="ratePerKg[]"]').value) || 0;
-                        const qty = parseFloat(row.children[2].innerText) || 0;
-                        const weight = parseFloat(row.children[1].innerText) || 0;
-                        const stock = parseFloat(row.querySelector('[name="itemStock[]"]').value) || 0;
-                        const cgst = parseFloat(row.children[4].innerText) || 0; 
-                        const sgst = parseFloat(row.children[5].innerText) || 0; 
+        });
 
-    
-                        let total = rate * qty * weight;
-                        total += (total * (cgst + sgst)) / 100; // Adding CGST & SGST
-    
-                        row.querySelector('[name="itemTotal[]"]').value = total.toFixed(2);
-                        grandTotal += total;
-                    });
-    
-                    document.getElementById('grandTotal').value = grandTotal.toFixed(2);
-    
-                }
-                if (lowStockItems.length > 0) {
-                    alert(`⚠️ Stock is low for: ${lowStockItems.join(", ")}`);
-                }
+        document.querySelectorAll('.rate').forEach(input => {
+                input.addEventListener('input', updateTotals);
             });
-    </script>
     
-
-
-
+            function updateTotals() {
+                let grandTotal = 0;
+            
+                document.querySelectorAll('#itemsTable tbody tr').forEach(row => {
+                    const rate = parseFloat(row.querySelector('[name="ratePerKg[]"]').value) || 0;
+                    const qty = parseFloat(row.children[2].innerText) || 0;
+                    const weight = parseFloat(row.children[1].innerText) || 0;
+                    const cgst = parseFloat(row.children[4].innerText) || 0; 
+                    const sgst = parseFloat(row.children[5].innerText) || 0; 
+            
+                    let total = rate * qty * weight;
+                    total += (total * (cgst + sgst)) / 100; 
+            
+                    row.querySelector('[name="itemTotal[]"]').value = total.toFixed(2);
+                    grandTotal += total;
+                });
+            
+                document.getElementById('grandTotal').value = grandTotal.toFixed(2);
+            }
+            if (lowStockItems.length > 0) {
+                    alert(`⚠️ Stock is low for: ${lowStockItems.join(", ")}`,window.location.href = "/dashboard");
+                }
+        });
+    </script>
 </body>
 </html>
