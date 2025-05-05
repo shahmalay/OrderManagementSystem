@@ -670,7 +670,7 @@ app.post('/forget/password/:userid', (req, res) => {
     <p style="font-size:16px; margin-bottom:20px;">
       If you're having trouble clicking the button, copy and paste the URL below into your browser:
     </p>
-    <p style="font-size:14px; word-break:break-all;">http://localhost:3000/reset-password/${row.user_id}/${token}</p>
+    <p style="font-size:14px; word-break:break-all;">${process.env.BASE_URL}/reset-password/${row.user_id}/${token}</p>
     <p style="font-size:12px; color:#aaa; text-align:center; margin-top:30px;">
     </p>
   </div>
