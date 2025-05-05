@@ -662,7 +662,7 @@ app.post('/forget/password/:userid', (req, res) => {
       If you did not request a password reset, please ignore this email.
     </p>
     <div style="text-align:center; margin-bottom:20px;">
-      <a href="http://localhost:3000/reset-password/${row.user_id}/${token}" 
+      <a href="${process.env.BASE_URL}/reset-password/${row.user_id}/${token}" 
          style="display:inline-block; background-color:#4ade80; color:#000; font-weight:bold; padding:15px 25px; text-decoration:none; border-radius:5px;">
         Reset Password
       </a>
