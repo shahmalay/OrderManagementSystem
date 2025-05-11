@@ -140,7 +140,6 @@ function custRedir(){
     window.location.href = '/sbbs/customer';
   }
 }
-
   function Logout() {
     fetch('/logout', { method: 'GET' })
         .then(response => {
@@ -154,7 +153,6 @@ function custRedir(){
         })
         .catch(error => console.error('Error logging out:', error));
   }
-
   fetch('/get/order')
       .then(response => response.json())
       .then(data => {
@@ -169,7 +167,7 @@ function custRedir(){
               </div>
               <div class='content'>
                 <p>NOTE : ${order.note} <br> DATE : ${order.date} <br> BY : ${order.username}</p>
-                <a href='/generate/bill/${order.order_id}' class="px-4 py-2 bg-[#faf5ef] text-gray-800 rounded-lg border border-[#5b3e2d]-500 shadow-sm hover:bg-teal-600 hover:text-[#faf5ef] transition duration-300 text-center">Generate Bill</a>
+                <a href='/generate/bill/${order.order_id}' class="px-4 py-2 bg-[#faf5ef] text-gray-800 rounded-lg border border-[#5b3e2d]-500 shadow-sm hover:bg-green-600 hover:text-[#faf5ef] transition duration-300 text-center">Generate Bill</a>
               </div>
             </div>
           `;
